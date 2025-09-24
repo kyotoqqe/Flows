@@ -11,9 +11,9 @@ class DatabaseSettings(BaseSettings):
     postgres_user: str
     postgres_password: str
     postgres_db: str
-    postgres_driver: str = "asynpg"
+    postgres_driver: str = "asyncpg"
 
-    model_config = SettingsConfigDict(env_file=ENV_PATH)
+    model_config = SettingsConfigDict(env_file=ENV_PATH, extra="ignore")
 
     @property
     def get_db_url(self) -> str:
