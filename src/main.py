@@ -13,6 +13,7 @@ from src.profiles.routers import router as profiles_router
 
 from src.core.redis.connection import redis_connection
 
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     users_mappers()

@@ -1,6 +1,7 @@
 from dataclasses import dataclass, field
 
 from src.core.domain.entities import Entity, AggregateRoot
+from src.core.domain.value_obj import Image
 from src.profiles.domain.value_obj import ProfileType, Relationship, FollowRequest
 
 from typing import Optional, List
@@ -154,10 +155,8 @@ class RelationshipGroup(AggregateRoot):
 class Profile(Entity):
     user_id: int
     username: str
-    #create value obj from image
-    #image_url: str
+    #image: Image
     profile_type: ProfileType = field(default=ProfileType.public)
-    #move to separate mixin
     created_at: datetime = field(init=False)
     updated_at: datetime = field(init=False)
     first_name: Optional[str] = None

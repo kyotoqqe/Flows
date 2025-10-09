@@ -4,6 +4,11 @@ from datetime import datetime
 
 from src.core.domain.entities import AbstractModel
 
+
+@dataclass
+class ValueObj(AbstractModel):
+    pass
+
 @dataclass
 class Image(AbstractModel):
     key: str

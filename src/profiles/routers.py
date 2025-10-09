@@ -1,5 +1,7 @@
 from fastapi import APIRouter, Depends, UploadFile
 
+from src.core.worker.tasks import execute, add, divide
+
 from src.auth.schemas import UserSchema
 from src.auth.dependencies import get_active_user
 
@@ -22,6 +24,10 @@ async def update_profile(
     profile_data:ProfileUpdateSchema = Depends(Checker(pydantic_model=ProfileUpdateSchema)),
     avatar: Optional[UploadFile] = None
     ):
+    res1 = execute.delay(add, 5, 2)
+    res2 = execute.delay(divide, 10, 2)
+    print(res1.get())
+    print(res2.get())
     if avatar:
         avatar = avatar.file
     service = ProfileService(uow=SQLAlchemyProfilesUnitOfWork())
