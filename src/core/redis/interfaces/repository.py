@@ -13,7 +13,6 @@ class RedisRepository(AbstractRepository):
 
     def __init__(self, redis: Redis, pipeline: Union[Redis, Pipeline]):
         self.redis = redis
-        #maybe fix later idk
         self.pipeline = pipeline
 
     def _key_builder(self, strict_mode: bool = True, **kwargs):

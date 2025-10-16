@@ -1,3 +1,8 @@
+from src.core.domain.mixins import BusinessRuleValidationMixin
+
+class DomainService(BusinessRuleValidationMixin):
+    pass 
+
 #temporary
 from src.core.domain.value_obj import Image
 

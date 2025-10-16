@@ -2,7 +2,7 @@ import uuid
 from typing import Optional, BinaryIO
 
 from src.core.domain.value_obj import Image
-from src.core.domain.service import ImageClenupService
+from src.core.domain.services import ImageClenupService
 from src.core.s3.client import S3Client
 
 from src.profiles.interfaces.units_of_work import ProfilesUnitOfWork, RelationshipsGroupsUnitOfWork, FollowRequestsUnitOfWork

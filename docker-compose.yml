@@ -53,11 +53,23 @@ services:
       dockerfile: Dockerfile
     volumes:
       - .:/usr/src/app
-    command: celery -A src.core.worker worker --loglevel=INFO
+    command: celery -A src.core.worker worker --loglevel=INFO -Q mailing
     depends_on:
       - flows-app
       - redis
 
+  flower:
+    image: flower
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - 5555:5555
+    volumes:
+      - .:/usr/src/app
+    command: celery -A src.core.worker flower
+    depends_on:
+      - celery
 volumes:
   pgdata: {}
   data: {}

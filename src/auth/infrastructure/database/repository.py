@@ -1,8 +1,8 @@
 from src.core.database.interfaces.repository import SQLAlchemyRepository
 
 from src.auth.interfaces.repository import UsersRepository, RefreshSessionsRepository
-from src.auth.domain.entities import User, RefreshSession
-
+from src.auth.domain.entities import User
+from src.auth.domain.value_obj import RefreshSession
 
 class SQLAlchemyUsersRepository(SQLAlchemyRepository, UsersRepository):
     model = User

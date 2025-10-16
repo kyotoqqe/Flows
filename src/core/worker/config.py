@@ -9,6 +9,7 @@ class CelerySettings(BaseSettings):
     accept_content: list[str]
     broker_url: str
     result_backend: str
+    #worker_prefech_multiplier: int
 
     model_config = SettingsConfigDict(
         env_prefix="CELERY_",

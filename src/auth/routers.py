@@ -9,6 +9,10 @@ from pydantic import Base64Str, EmailStr
 
 from typing import Annotated
 
+from src.core.worker.tasks_queue import CeleryTaskQueue 
+#maybe move app to __init__.py
+from src.core.worker.celery import app
+
 from src.auth.schemas import RegistrationSchema, UserSchema
 from src.auth.units_of_work import SQLAlchemyUsersUnitOfWork, RedisRefreshSessionsUnitOfWork
 from src.auth.services import AuthService
@@ -16,6 +20,8 @@ from src.auth.config import cookie_settings
 from src.auth.infrastructure.utils import oauth2_scheme_cookie
 from src.auth.dependencies import get_active_user
 from src.auth.infrastructure.oauth2 import generate_spotify_oauth_redirect_uri
+
+from src.mailing.service import SMTPConfirmationEmailSender
 
 from src.profiles.units_of_work import SQLAlchemyProfilesUnitOfWork
 
@@ -28,7 +34,11 @@ router = APIRouter(
 async def registraion(user_data: RegistrationSchema) -> UserSchema:
     user_data = user_data.model_dump(exclude={"password2"})
     service = AuthService(uow=SQLAlchemyUsersUnitOfWork())
-    return await service.registration(**user_data)
+    return await service.registration(
+        task_queue=CeleryTaskQueue(app=app),
+        email_sender=SMTPConfirmationEmailSender(),
+        **user_data
+    )
     
 
 @router.get("/confirm")

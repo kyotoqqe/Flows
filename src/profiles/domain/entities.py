@@ -10,7 +10,6 @@ from datetime import datetime
 @dataclass(eq=False)
 class RelationshipGroup(AggregateRoot):
     relation_id: str
-    version_num: int = 0
 
     def _search_profile(self, profile_id: int):
         for profile in self.profiles:

@@ -8,7 +8,6 @@ users_table = Table(
     mapper_registry.metadata,
     Column("id", Integer, primary_key=True, autoincrement=True, nullable=False, unique=True,),
     Column("email", String(128), nullable=False, unique=True),
-    Column("username", String(32), nullable=False, unique=True),
     Column("password", String(60), nullable=False),
     Column("active", Boolean, default=False, nullable=False),
     Column("created_at", DateTime, server_default=func.now(), nullable=False),
@@ -27,7 +26,8 @@ refresh_sessions_table = Table(
 
 
 def start_mappers():
-    from src.auth.domain.entities import User, RefreshSession
+    from src.auth.domain.entities import User
+    from src.auth.domain.value_obj import RefreshSession
 
     mapper_registry.map_imperatively(
         class_=User, 

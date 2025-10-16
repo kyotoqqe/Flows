@@ -32,7 +32,7 @@ relationships_table = Table(
     Column("id", Integer, primary_key=True, autoincrement=True, nullable=False, unique=True),
     Column("follower_id", ForeignKey("profiles.id", ondelete="CASCADE"), nullable=False, primary_key=True),
     Column("following_id", ForeignKey("profiles.id", ondelete="CASCADE"), nullable=False, primary_key=True),
-    Column("relation_id", String(50), ForeignKey("relationships_groups.relation_id"), nullable=False),
+    Column("relation_id", String(50), ForeignKey("relationships_groups.relation_id", ondelete="CASCADE"), nullable=False),
     Column("is_followed",Boolean, default=False, nullable=False),
     Column("is_blocked",Boolean, default=False, nullable=False),
 )

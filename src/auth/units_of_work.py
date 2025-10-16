@@ -22,3 +22,4 @@ class RedisRefreshSessionsUnitOfWork(RedisUnitOfWork, RefreshSessionsUnitOfwork)
             pipeline=self._pipe
         )
         return uow
+

@@ -10,5 +10,14 @@ app.conf.update(
     **settings_dict
 )
 app.autodiscover_tasks(["src.core.worker"])
+app.conf.task_routes = {
+    "mailing.tasks.*" : {"queue": "mailing"}
+}
 
+def get_route_tasks():
+    from src.core.worker.tasks import send_email
 
+    ROUTE_TASK = {
+        "send_email": send_email,
+    }
+    return ROUTE_TASK

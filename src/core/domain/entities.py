@@ -1,5 +1,7 @@
 from dataclasses import field, dataclass
+
 from src.core.interfaces.model import AbstractModel
+from src.core.domain.mixins import BusinessRuleValidationMixin
 
 @dataclass(eq=False)
 class Entity(AbstractModel):
@@ -13,7 +15,7 @@ class Entity(AbstractModel):
     def __hash__(self):
         return hash(self.id)
 #fix this
-
-class AggregateRoot(AbstractModel):
-    pass
+@dataclass(kw_only=True)
+class AggregateRoot(Entity, BusinessRuleValidationMixin):
+    version_num: int
 

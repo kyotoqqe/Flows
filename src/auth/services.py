@@ -1,25 +1,33 @@
 import uuid
 
+from src.core.domain.exceptions import EntityNotFound, EntityAlreadyExist
+from src.core.interfaces.tasks_queue import AbstractTaskQueue
+
 from src.auth.interfaces.units_of_work import UsersUnitOfWork, RefreshSessionsUnitOfwork
-from src.auth.domain.entities import User, RefreshSession
+from src.auth.domain.entities import User
+from src.auth.domain.value_obj import RefreshSession
 from src.auth.domain.services import ProfileCreator
 from src.auth.infrastructure.utils import generated_password_hash, create_confirmation_link, \
                                           generate_token, decode_token, \
                                           verify_password, create_password_reset_link
-from src.auth.schemas import JWTTokenPayload, Token
+from src.auth.domain.dto import JWTTokenPayload, Token
 from src.auth.infrastructure.jwt.config import jwt_settings
 from src.auth.infrastructure.jwt.utils import create_jwt_token, decode_jwt_token
 
-from src.mailing.service import send_confirmation_email, send_password_reset_email
+from src.mailing.interface import AbstractEmailSender
 
 from src.profiles.interfaces.units_of_work import ProfilesUnitOfWork
 
+import time
 from datetime import datetime, timezone, timedelta
 from typing import Optional
 
+
 class AuthService:
 
-    def __init__(self, uow: UsersUnitOfWork, redis_uow: Optional[RefreshSessionsUnitOfwork] = None):
+    def __init__(self, 
+                 uow: Optional[UsersUnitOfWork] = None, 
+                 redis_uow: Optional[RefreshSessionsUnitOfwork] = None):
         self._uow = uow
         self._redis_uow = redis_uow
     
@@ -29,23 +37,33 @@ class AuthService:
             user = await self._uow.users.get(id=user_data.user_id)
 
             if not user:
-                raise #UserDontExist
+                raise EntityNotFound(
+                    User, 
+                    user_id=user.id
+                )
 
             return user
     
-    async def registration(self, email: str, username: str, password:str):
+    async def registration(self, 
+                        email: str,
+                        username: str,
+                        password:str,
+                        task_queue:AbstractTaskQueue,
+                        email_sender: AbstractEmailSender
+            ):
         async with self._uow:
-            #search username in profiles
-            user = await self._uow.users.get(email=email, username=username)
+            user = await self._uow.users.get(email=email)
 
             if user:
-                pass #raise UserExist
+                raise EntityAlreadyExist(
+                    User,
+                    email=email
+                )
 
             password_hash = generated_password_hash(password)
 
             user = User(
                 email=email,
-                username=username,
                 password=password_hash
             )
             
@@ -57,11 +75,12 @@ class AuthService:
             await self._uow.commit()
 
             token = generate_token(user_id=user.id)
-            await send_confirmation_email(
-                username=user.username,
-                recipient=user.email,
-                confirmation_link=create_confirmation_link(token),
-            ) # use celery
+            task_queue.execute(
+                email_sender.send_email,
+                username,
+                user.email,
+                create_confirmation_link(token), 
+            )
             return user
     
     async def confirm_user(self,profiles_uow: ProfilesUnitOfWork, token: str):
@@ -70,8 +89,9 @@ class AuthService:
             user = await self._uow.users.get(id=user_id)
 
             if not user:
-                raise #UserNotFound
-            user.activate()
+                raise EntityNotFound
+            
+            user.is_active = True
             user = await self._uow.users.update(user, id=user.id)
             #call profile service
             #use event driven
@@ -179,8 +199,8 @@ class AuthService:
             token = generate_token(user_id=user.id)
             password_confirmation_link = create_password_reset_link(token)
 
-            await send_password_reset_email(
+            """ await send_password_reset_email(
                 user.username,
                 recepient=user.email,
                 password_reset_link=password_confirmation_link
-            )
+            ) """

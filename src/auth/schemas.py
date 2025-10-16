@@ -50,24 +50,9 @@ class RegistrationSchema(BaseModel):
 class UserSchema(BaseModel):
     id: int
     email: str
-    username: str
     active: bool
 
 class LoginShema(BaseModel):
     username: str
     password: str
 
-class TokenPayload(BaseModel):
-    user_id: int
-    exp: datetime 
-
-class Base64TokenPayload(TokenPayload):
-    pass
-
-class JWTTokenPayload(TokenPayload):
-    pass
-
-# fix name
-class Token(BaseModel):
-    access: str
-    refresh: UUID4
