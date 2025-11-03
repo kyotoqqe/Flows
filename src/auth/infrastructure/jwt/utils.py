@@ -1,15 +1,15 @@
 import jwt
 from jwt.exceptions import  InvalidTokenError ,ExpiredSignatureError 
+from dataclasses import asdict
 
-from src.auth.domain.dto import JWTTokenPayload
+from src.auth.infrastructure.dto import JWTTokenPayload
 from src.auth.infrastructure.jwt.config import jwt_settings
 
-#change method and also add user privilege in payload
 def create_jwt_token(payload: JWTTokenPayload):
-    payload = payload.model_dump()
+    payload_as_dict = asdict(payload)
     
     access_token = jwt.encode(
-        payload=payload,
+        payload=payload_as_dict,
         key=jwt_settings.jwt_secret,
         algorithm=jwt_settings.algorithm
     ) 
@@ -25,7 +25,8 @@ def decode_jwt_token(token: str) -> JWTTokenPayload:
         )
         return JWTTokenPayload(
             user_id = data["user_id"],
-            exp = data["exp"]
+            exp = data["exp"],
+            role = data["role"]
         )
     except (ExpiredSignatureError, InvalidTokenError):
         raise

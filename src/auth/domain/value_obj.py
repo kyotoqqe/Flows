@@ -1,3 +1,4 @@
+import enum
 from dataclasses import dataclass, field
 from uuid import UUID
 from datetime import datetime
@@ -10,3 +11,8 @@ class RefreshSession(ValueObj):
     token:UUID
     expires_in:int
     created_at: datetime = field(init=False)
+
+class UserRole(str, enum.Enum):
+    superuser = "Superuser"
+    admin = "Admin"
+    member = "Member"

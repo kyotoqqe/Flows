@@ -1,7 +1,9 @@
-from sqlalchemy import Table, Column, Integer, String, Boolean, UUID, BigInteger, DateTime, ForeignKey, func
+from sqlalchemy import Table, Column, Integer, String, Boolean, UUID, BigInteger, DateTime, Enum, ForeignKey, func
 from sqlalchemy.orm import relationship
 
 from src.core.database.metadata import mapper_registry
+
+from src.auth.domain.value_obj import UserRole
 
 users_table = Table(
     "users",
@@ -9,6 +11,7 @@ users_table = Table(
     Column("id", Integer, primary_key=True, autoincrement=True, nullable=False, unique=True,),
     Column("email", String(128), nullable=False, unique=True),
     Column("password", String(60), nullable=False),
+    Column("role", Enum(UserRole, create_type=True), default=UserRole.member, nullable=False),
     Column("active", Boolean, default=False, nullable=False),
     Column("created_at", DateTime, server_default=func.now(), nullable=False),
     Column("updated_at", DateTime, server_default=func.now(), nullable=False)

@@ -11,7 +11,7 @@ class IsValidRefreshSessionCount(BaseRule):
         self.count = sessions_count
     
     def is_broken(self) -> bool:
-        return self.count > self.VALID_REFRESH_SESSION_NUMBER
+        return self.count == self.VALID_REFRESH_SESSION_NUMBER
     
     def get_message(self) -> str:
         return self.__message.format(valid_refresh_session_number = self.VALID_REFRESH_SESSION_NUMBER)

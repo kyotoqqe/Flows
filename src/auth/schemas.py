@@ -1,11 +1,8 @@
 from pydantic import BaseModel, EmailStr, field_validator, model_validator, UUID4
 
 from typing import Self
-from datetime import datetime
 
-class RegistrationSchema(BaseModel):
-    email: EmailStr
-    username: str
+class PaswordMixin(BaseModel):
     password: str
     password2: str
 
@@ -46,13 +43,19 @@ class RegistrationSchema(BaseModel):
         if self.password != self.password2:
             raise ValueError('Passwords do not match') #PasswordMatchError
         return self
+class RegistrationSchema(PaswordMixin):
+    email: EmailStr
+    username: str
+    
 
 class UserSchema(BaseModel):
     id: int
     email: str
     active: bool
 
-class LoginShema(BaseModel):
-    username: str
+class LoginSchema(BaseModel):
+    email: str
     password: str
 
+class PasswordResetSchema(PaswordMixin):
+    token: str

@@ -2,13 +2,14 @@ import asyncio
 import inspect
 from aiosmtplib.errors import SMTPConnectError, SMTPTimeoutError, SMTPServerDisconnected
 
-from src.mailing.service import SMTPConfirmationEmailSender
+from src.mailing.service import SMTPConfirmationEmailSender, SMTPPasswordResetEmailSender
 from src.core.worker.celery import app
 from src.core.worker.exceptions import FunctionRealizationDontExist
 
 
 SEND_EMAIL_REALIZATION = {
     "SMTPConfirmationEmailSender.send_email" : SMTPConfirmationEmailSender.send_email,
+    "SMTPPasswordResetEmailSender.send_email": SMTPPasswordResetEmailSender.send_email,
 }
 
 @app.task(
@@ -33,7 +34,6 @@ def send_email(
     *args, **kwargs
 ):
     func = None
-    print(args)
     for realization in SEND_EMAIL_REALIZATION.keys():
         if realization == realization_name:
             func = SEND_EMAIL_REALIZATION[realization]

@@ -1,5 +1,6 @@
 import aiohttp
 import base64
+import jwt
 
 from fastapi import APIRouter, Response, Depends, Body
 from fastapi.security import OAuth2PasswordRequestForm
@@ -13,15 +14,15 @@ from src.core.worker.tasks_queue import CeleryTaskQueue
 #maybe move app to __init__.py
 from src.core.worker.celery import app
 
-from src.auth.schemas import RegistrationSchema, UserSchema
+from src.auth.schemas import RegistrationSchema, UserSchema, PasswordResetSchema
 from src.auth.units_of_work import SQLAlchemyUsersUnitOfWork, RedisRefreshSessionsUnitOfWork
 from src.auth.services import AuthService
 from src.auth.config import cookie_settings
 from src.auth.infrastructure.utils import oauth2_scheme_cookie
 from src.auth.dependencies import get_active_user
-from src.auth.infrastructure.oauth2 import generate_spotify_oauth_redirect_uri
+from src.auth.infrastructure.oauth2 import generate_spotify_oauth_redirect_uri, generate_google_oauth_redirect_url
 
-from src.mailing.service import SMTPConfirmationEmailSender
+from src.mailing.service import SMTPConfirmationEmailSender, SMTPPasswordResetEmailSender
 
 from src.profiles.units_of_work import SQLAlchemyProfilesUnitOfWork
 
@@ -54,7 +55,7 @@ async def login(user_data: Annotated[OAuth2PasswordRequestForm, Depends()],
         response: Response
     ) :
     user_data = {
-        "username": user_data.username,
+        "email": user_data.username,
         "password": user_data.password
     }
     service = AuthService(
@@ -82,7 +83,6 @@ async def logout(
     response: Response, 
     refresh_token: Annotated[str, Depends(oauth2_scheme_cookie)]
 ):
-    print(refresh_token)
     service = AuthService(
         uow=SQLAlchemyUsersUnitOfWork(),
         redis_uow=RedisRefreshSessionsUnitOfWork()
@@ -100,6 +100,7 @@ async def logout(
 
     return {"message":"LogOut successful"}
 
+#fix that
 @router.post("/token/refresh")
 async def refresh(
     user: Annotated[UserSchema, Depends(get_active_user)],
@@ -132,11 +133,21 @@ async def get_me(user: Annotated[UserSchema, Depends(get_active_user)]) -> UserS
 @router.post("/password/reset/request")
 async def password_reset(email: EmailStr):
     service = AuthService(uow=SQLAlchemyUsersUnitOfWork())
-    await service.password_reset(email)
+    await service.password_reset(
+        email=email,
+        task_queue=CeleryTaskQueue(app=app),
+        email_sender=SMTPPasswordResetEmailSender(),
+        profiles_uow=SQLAlchemyProfilesUnitOfWork(),
+    )
+    
 
 @router.post("/password/reset/confirm")
-async def reset_confirm(token:Base64Str):
-    pass
+async def reset_confirm(reset_data:PasswordResetSchema):
+    service = AuthService(
+        uow=SQLAlchemyUsersUnitOfWork()
+    )
+    reset_dict = reset_data.model_dump(exclude={"password2"})
+    await service.password_reset_confirm(**reset_dict)
 
 @router.get("/spotify/url")
 def get_spotify_oauth_redirect_uri():
@@ -169,3 +180,35 @@ async def get_spotify_code(code: Annotated[str, Body(embed=True)]):
         ) as response:
             res = await response.json()
             print(res)
+
+@router.get("/google/url")
+def get_google_oauth_redirect_uri():
+    uri = generate_google_oauth_redirect_url()
+    return uri
+
+@router.post("/google/callback")
+async def get_google_code(code: Annotated[str, Body(embed=True)]):
+    google_token_url = "https://oauth2.googleapis.com/token"
+
+    async with aiohttp.ClientSession() as session:
+        async with session.post(
+            url=google_token_url,
+            data= {
+                "client_id": "590257258073-5sklsocbe7rbd0pkvlf35v7ro84ok2ab.apps.googleusercontent.com",
+                "client_secret": "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",
+                "grant_type": "authorization_code",
+                "redirect_uri": "http:/127.0.0.1:8000/api/auth/google/callback",
+                "code": code
+            },
+            ssl=False #change on True before deploy
+        ) as response:
+            res = await response.json()
+            print(res)
+            id_token = res["id_token"]
+            user_data = jwt.decode(
+                id_token,
+                algorithms=["RS256"],
+                options={"verify_signature": False}
+            )
+            print(user_data)
+            return user_data

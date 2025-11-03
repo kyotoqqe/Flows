@@ -13,12 +13,19 @@ from src.profiles.routers import router as profiles_router
 
 from src.core.redis.connection import redis_connection
 
+from src.admin.middlewares import RefreshTokenMiddleware
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     users_mappers()
     profiles_mappers()
     images_mappers()
+
+    from src.admin.config import admin
+    from src.admin.views import UserAdmin
+    
+    admin.add_view(UserAdmin)
     yield
     clear_mappers()
     await redis_connection.aclose()
@@ -28,6 +35,6 @@ app = FastAPI(
     lifespan=lifespan,
     root_path="/api"
 )
-
+#app.add_middleware(RefreshTokenMiddleware)
 app.include_router(auth_router)
 app.include_router(profiles_router)

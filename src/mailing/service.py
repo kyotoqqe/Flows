@@ -86,30 +86,34 @@ If you didn’t create an account, you can safely ignore this email.
             html_content=html_content
         )
 
-""" async def send_password_reset_email(
+class SMTPPasswordResetEmailSender(SMTPEmailSender):
+    
+    @classmethod
+    async def send_email(
+        cls,
         username: str,
         recepient: str,
         password_reset_link: str
-):
-    subject = "Reset your password on site.com"
-    plain_text = dedent(fHello, { username }!
+    ):
+        subject = "Reset your password on site.com"
+        plain_text = dedent(f"""Hello, {username}!
 
 You have requested to reset the password for your account.
 
 To proceed, please click the following link:
 { password_reset_link }
-If you did not request a password reset, simply ignore this message.
+If you did not request a password reset, simply ignore this message."""
 )
-    template = templates.get_template("password_reset_email.html")
-    context = {
-        "username": username,
-        "password_reset_link": password_reset_link
-    }
-    html_content = template.render(context)
+        template = templates.get_template("password_reset_email.html")
+        context = {
+            "username": username,
+            "password_reset_link": password_reset_link
+        }
+        html_content = template.render(context)
 
-    await send_email(
-        recepient=recepient,
-        subject=subject,
-        plain_content=plain_text,
-        html_content=html_content
-    ) """
+        await super().send_email(
+            recepient=recepient,
+            subject=subject,
+            plain_content=plain_text,
+            html_content=html_content
+        )

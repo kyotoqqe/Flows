@@ -57,7 +57,7 @@ class RedisRepository(AbstractRepository):
         await self.pipeline.set(key, model_json)
         if ttl:
             await self.pipeline.expire(key, ttl)
-        print(key)
+        
     
     async def delete(self, *filter, **filter_by):
         key = self._key_builder(**filter_by)

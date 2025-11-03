@@ -8,12 +8,13 @@ from fastapi import Request
 from fastapi.security import OAuth2
 from fastapi.openapi.models import OAuthFlows
 
-from datetime import datetime, timezone, timedelta
 from typing import Optional, Dict
+from datetime import datetime, timezone
 
 from src.config import core_settings
 
-from src.auth.domain.dto  import Base64TokenPayload
+from src.auth.infrastructure.dto  import TokenPayload, Base64TokenPayload, PasswordResetTokenPayload
+from src.auth.infrastructure.exceptions import ActivationTokenExpiredError
 from src.auth.config import cookie_settings
 
 pwd_context = CryptContext(
@@ -28,32 +29,45 @@ def generated_password_hash(password:str) -> str:
 def verify_password(input_password:str, password_hash:str) -> bool:
     return pwd_context.verify(input_password, password_hash)
 
-def generate_token(user_id: int):
-    payload = Base64TokenPayload(user_id = user_id)
+def generate_token(payload: TokenPayload):
     payload_as_dict = asdict(payload)
     payload_as_json = json.dumps(payload_as_dict)
     token_encode = urlsafe_b64encode(payload_as_json.encode()) 
     return token_encode.decode()
 
 def decode_token(token: str) -> Base64TokenPayload:
-
     payload = urlsafe_b64decode(token)
-    payload_json = json.loads(payload.decode())
-    payload_model = Base64TokenPayload(**payload_json)
+    payload_dict = json.loads(payload.decode())
+    payload_dto = Base64TokenPayload(
+        user_id=payload_dict["user_id"],
+        username=payload_dict["username"],
+        exp=payload_dict["exp"],
+    )
 
-    if datetime.now(timezone.utc) > datetime.fromisoformat(payload_model.exp):
-        #raise invalid token send confirm email again
-        print("invalid confirm token")
-        
-        pass
+    if datetime.now(timezone.utc) > datetime.fromisoformat(payload_dto.exp):
+        raise ActivationTokenExpiredError
 
-    return payload_model.user_id
+    return payload_dto
+
+def decode_password_reset_token(token:str):
+    payload = urlsafe_b64decode(token)
+    payload_dict = json.loads(payload.decode())
+    payload_dto = PasswordResetTokenPayload(
+        user_id=payload_dict["user_id"],
+        exp=payload_dict["exp"],
+    )
+
+    if datetime.now(timezone.utc) > datetime.fromisoformat(payload_dto.exp):
+        raise ActivationTokenExpiredError
+
+    return payload_dto
 
 def create_confirmation_link(token: str) -> str:
     return  f"{core_settings.base_url}api/auth/confirm/?token={token}"
 
 def create_password_reset_link(token: str) -> str:
     return f"{core_settings.base_url}api/auth/password/reset/confirm/?token={token}"
+
 
 #move to oauth maybe
 class OAuth2Cookie(OAuth2):
