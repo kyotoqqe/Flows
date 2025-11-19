@@ -4,11 +4,11 @@ from src.core.interfaces.handlers import AbstractCommandHandler, AbstractEventHa
 from src.core.messagebus import MessageBus
 from src.core.domain.exceptions import EntityAlreadyExist
 
-from src.organizations.application.commands import CreateOrganizationRequest, CheckOrganizationExistence, DeleteOrganizationRequest
-from src.organizations.interfaces.units_of_works import OrganizationRequestsUnitOfWork, OrganizationsUnitOfWork
-from src.organizations.domain.value_obj import OrganizationRequest
-from src.organizations.domain.entities import Organization
-from src.organizations.application.units_of_work import RedisOrganizationRequestsUnitOfWork, SQLAlchemyOrganizationsUnitOfWork
+from src.organizations.organizations.application.commands import CreateOrganizationRequest, CheckOrganizationExistence, DeleteOrganizationRequest
+from src.organizations.organizations.interfaces.units_of_works import OrganizationRequestsUnitOfWork, OrganizationsUnitOfWork
+from src.organizations.organizations.domain.value_obj import OrganizationRequest
+from src.organizations.organizations.domain.entities import Organization
+from src.organizations.organizations.application.units_of_work import RedisOrganizationRequestsUnitOfWork, SQLAlchemyOrganizationsUnitOfWork
 
 from src.payments.application.events import OrganizationPaymentSucceeded
 

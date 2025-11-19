@@ -3,10 +3,10 @@ import asyncio
 from src.core.database.orm import start_mappers as images_mappers
 from src.auth.infrastructure.database.orm import start_mappers as users_mappers
 from src.profiles.infrastructure.database.orm import start_mappers as profiles_mappers
-from src.organizations.infrastructure.database.orm import start_mappers as organizations_mappers
+from src.organizations.organizations.infrastructure.database.orm import start_mappers as organizations_mappers
 
 
-from src.organizations.infrastructure.rabbitmq.broker import OrganizationRabbitMQBroker
+from src.organizations.organizations.infrastructure.rabbitmq.broker import OrganizationRabbitMQBroker
 from src.payments.infrastructure.rabbitmq.broker import PaymentsRabbitMQBroker
 
 from src.core.rabbitmq.connection import get_connection

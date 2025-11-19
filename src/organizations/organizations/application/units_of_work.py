@@ -1,12 +1,10 @@
 from src.core.redis.interfaces.units_of_work import RedisUnitOfWork
 from src.core.database.interfaces.units_of_work import SQLAlchemyUnitOfWork
 
-from src.organizations.interfaces.units_of_works import OrganizationRequestsUnitOfWork, OrganizationsUnitOfWork
-from src.organizations.infrastructure.redis.repository import RedisOrganizationRequestsRepository
-from src.organizations.infrastructure.database.repository import SQLAlchemyOrganizationsRepository
+from src.organizations.organizations.interfaces.units_of_works import OrganizationRequestsUnitOfWork, OrganizationsUnitOfWork
+from src.organizations.organizations.infrastructure.redis.repository import RedisOrganizationRequestsRepository
+from src.organizations.organizations.infrastructure.database.repository import SQLAlchemyOrganizationsRepository
 
-#----------------
-from src.organizations.application.events import OrganizationRequestCreated
 
 class RedisOrganizationRequestsUnitOfWork(RedisUnitOfWork, OrganizationRequestsUnitOfWork):
 
