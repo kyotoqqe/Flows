@@ -16,6 +16,6 @@ organizations_table = Table(
 )
 
 def start_mappers():
-    from src.organizations.domain.entities import Organization
+    from src.organizations.organizations.domain.entities import Organization
 
     mapper_registry.map_imperatively(Organization, organizations_table)
