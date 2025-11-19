@@ -8,7 +8,6 @@ from src.organizations.organizations.application.commands import CreateOrganizat
 from src.organizations.organizations.interfaces.units_of_works import OrganizationRequestsUnitOfWork, OrganizationsUnitOfWork
 from src.organizations.organizations.domain.value_obj import OrganizationRequest
 from src.organizations.organizations.domain.entities import Organization
-from src.organizations.organizations.application.units_of_work import RedisOrganizationRequestsUnitOfWork, SQLAlchemyOrganizationsUnitOfWork
 
 from src.payments.application.events import OrganizationPaymentSucceeded
 
@@ -78,29 +77,3 @@ class DeleteOrganizationRequestHandler(AbstractCommandHandler):
             await self.uow.organization_requests.delete(**asdict(command))
             await self.uow.commit()
 
-DOMAIN_EVENT_HANDLERS_FOR_INJECTION = {
-
-}
-
-EXTERNAL_EVENT_HANDLERS_FOR_INJECTION = {
-    
-}
-
-EVENT_HANDLERS_FOR_INJECTION = {
-    #maybe create separate dict for external events
-    OrganizationPaymentSucceeded: [
-        CreateOrganizationHandler(uow=SQLAlchemyOrganizationsUnitOfWork())
-    ]
-}
-
-COMMAND_HANDLERS_FOR_INJECTION = {
-    CreateOrganizationRequest: [
-        CreateOrganizationRequestHandler(uow=RedisOrganizationRequestsUnitOfWork(), ttl = 15 * 60)
-    ],
-    CheckOrganizationExistence: [
-        CheckOrganizationExistenceHandler(uow=SQLAlchemyOrganizationsUnitOfWork())
-    ],
-    DeleteOrganizationRequest: [
-        DeleteOrganizationRequestHandler(uow=RedisOrganizationRequestsUnitOfWork())
-    ]
-}
