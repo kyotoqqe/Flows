@@ -14,6 +14,7 @@ from src.core.database.config import db_settings
 from src.core.database.orm import images_table
 from src.auth.infrastructure.database.orm import  users_table, refresh_sessions_table
 from src.profiles.infrastructure.database.orm import profiles_table, relationships_table, relationships_groups
+from src.organizations.infrastructure.database.orm import organizations_table
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

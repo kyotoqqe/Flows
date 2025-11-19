@@ -70,6 +70,36 @@ services:
     command: celery -A src.core.worker flower
     depends_on:
       - celery
+
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: rabbitmq
+    ports:
+      - 5672:5672
+      - 15672:15672
+    env_file:
+      - ".env"
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+
+  rabbitmq-consumer:
+    image: rabbitmq-consumer
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - .:/usr/src/app
+    command: python3 -m src.core.rabbitmq.rabbitmq_eventconsumer
+    depends_on:
+      - rabbitmq
+
+  stripe:
+    image: stripe/stripe-cli
+    command: listen --forward-to flows-app:8000/payments/webhook --api-key $STRIPE_API_KEY
+    env_file:
+      - ".env"
+
 volumes:
   pgdata: {}
   data: {}
+  rabbitmq-data: {}

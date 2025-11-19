@@ -17,5 +17,5 @@ class Entity(AbstractModel):
 #fix this
 @dataclass(kw_only=True)
 class AggregateRoot(Entity, BusinessRuleValidationMixin):
-    version_num: int
+    version_num: int = field(default=0)
 

@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from typing import Optional
+from typing import Optional, Union, Dict, Set
 
 from src.core.interfaces.model import AbstractModel
 
@@ -26,5 +26,31 @@ class AbstractRepository(ABC):
     async def list(self) -> list[AbstractModel]:
         raise NotImplementedError
     
+class TrackingRepository:
+
+    def __init__(self, repository: AbstractRepository):
+        self.seen = set()
+        self.repository = repository
+
+    async def get(self, *filter, **filter_by):
+        model = await self.repository.get(*filter, **filter_by)
+        
+        if model:
+            self.seen.add(model)
+        return model
+
+    async def add(self, model: AbstractModel, exclude: Optional[Set] = None):
+        model = await self.repository.add()
+        self.seen.add(model)
+        return model
+    
+    async def delete(self, *filter, **filter_by):
+        #add tracking
+        await self.repository.delete(*filter, **filter_by)
+    
+    async def update(self, model: Union[AbstractModel, Dict], *filter, **filter_by):
+        self.seen.add(model)
+        return await self.repository.update(model, *filter, **filter_by)
+
 class ImagesRepository(AbstractRepository, ABC):
     pass

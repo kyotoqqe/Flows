@@ -33,7 +33,6 @@ class RedisRepository(AbstractRepository):
     async def get(self, scalar: bool = None,  *filter, **filter_by):
         key = self._key_builder(strict_mode=False, **filter_by)
         res = []
-        print(key)
         async for data in self.redis.scan_iter(match=key):
             data = await self.redis.get(data)
             model_dict = json.loads(data)
@@ -48,7 +47,6 @@ class RedisRepository(AbstractRepository):
     async def add(self, model: Union[AbstractModel, Dict], exclude: Optional[Set] = None, ttl: Optional[int] = None ):
         if isinstance(model, AbstractModel):
             model = await model.to_dict(exclude=exclude)
-        print(model)
         key = self._key_builder(**model)
         if await self.redis.exists(key):
             raise ValueError(f"{self.model.__name__} with this data already exist")

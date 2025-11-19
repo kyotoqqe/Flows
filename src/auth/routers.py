@@ -20,7 +20,7 @@ from src.auth.services import AuthService
 from src.auth.config import cookie_settings
 from src.auth.infrastructure.utils import oauth2_scheme_cookie
 from src.auth.dependencies import get_active_user
-from src.auth.infrastructure.oauth2 import generate_spotify_oauth_redirect_uri, generate_google_oauth_redirect_url
+#from src.auth.infrastructure.oauth2 import generate_spotify_oauth_redirect_uri, generate_google_oauth_redirect_url
 
 from src.mailing.service import SMTPConfirmationEmailSender, SMTPPasswordResetEmailSender
 

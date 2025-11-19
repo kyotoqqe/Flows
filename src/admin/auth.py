@@ -34,7 +34,6 @@ class AdminAuth(AuthenticationBackend):
 
     @only_for_superuser
     async def authenticate(self, request: Request) -> bool:
-        print("puupupu")
         # Check the token in depth
         return True
 
