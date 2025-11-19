@@ -1,6 +1,6 @@
 from src.core.rabbitmq.message_broker import RabbitMQMessageBroker
 
-from src.organizations.organizations.application.handlers import EVENT_HANDLERS_FOR_INJECTION, COMMAND_HANDLERS_FOR_INJECTION
+from src.organizations import EVENT_HANDLERS_FOR_INJECTION, COMMAND_HANDLERS_FOR_INJECTION
 
 #create interface
 class OrganizationRabbitMQBroker(RabbitMQMessageBroker):

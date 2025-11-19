@@ -7,7 +7,7 @@ from src.auth.schemas import UserSchema
 from src.auth.dependencies import get_active_user
 
 from src.organizations.organizations.api.schemas import CreateOrganizationRequestSchema
-from src.organizations.organizations.application.handlers import EVENT_HANDLERS_FOR_INJECTION, COMMAND_HANDLERS_FOR_INJECTION
+from src.organizations import EVENT_HANDLERS_FOR_INJECTION, COMMAND_HANDLERS_FOR_INJECTION
 from src.organizations.organizations.application.commands import CreateOrganizationRequest
 from src.organizations.organizations.infrastructure.rabbitmq.broker import OrganizationRabbitMQBroker
 
