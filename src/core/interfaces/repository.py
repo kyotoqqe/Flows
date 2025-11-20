@@ -40,8 +40,8 @@ class TrackingRepository:
         return model
 
     async def add(self, model: AbstractModel, exclude: Optional[Set] = None):
-        model = await self.repository.add()
         self.seen.add(model)
+        model = await self.repository.add(model, exclude)
         return model
     
     async def delete(self, *filter, **filter_by):

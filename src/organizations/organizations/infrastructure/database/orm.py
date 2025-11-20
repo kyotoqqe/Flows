@@ -10,7 +10,7 @@ organizations_table = Table(
     Column("name", String(128), nullable=False),
     Column("description", String(500), nullable=True),
     Column("nickname", String(32), nullable=False, unique=True),
-    Column("owner_id", ForeignKey("users.id", ondelete="CASCADE"), nullable=False),
+    Column("owner_id", ForeignKey("profiles.id", ondelete="CASCADE"), nullable=False),
     Column("created_at", DateTime, server_default=func.now(), nullable=False),
     Column("updated_at", DateTime, server_default=func.now(), nullable=False)
 )
