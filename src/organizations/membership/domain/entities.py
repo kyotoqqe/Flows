@@ -8,8 +8,8 @@ from src.organizations.membership.domain.value_obj import MemberRole
 @dataclass
 class Member(Entity):
     profile_id: int
-    description: Optional[str] = None
     role: MemberRole
+    description: Optional[str] = None
     can_change_organization_info: bool = field(default=False)
     can_invite_members: bool = field(default=False) 
     can_create_shows: bool = field(default=False)
