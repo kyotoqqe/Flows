@@ -16,6 +16,12 @@ class ProfileService:
     def __init__(self, uow: ProfilesUnitOfWork):
         self._uow = uow
 
+    async def get_profile_by_user_id(self, user_id:int):
+        async with self._uow:
+            profile = await self._uow.profiles.get(user_id=user_id)
+            await self._uow.commit()
+            return profile
+
     async def create_profile(self, user_id: int, username: str):
         async with self._uow:
             profile = Profile(
