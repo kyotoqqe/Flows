@@ -1,12 +1,12 @@
 from src.core.rabbitmq.message_broker import RabbitMQMessageBroker
 
-from src.organizations import EVENT_HANDLERS_FOR_INJECTION, COMMAND_HANDLERS_FOR_INJECTION
+from src.organizations import DOMAIN_EVENT_HANDLERS_FOR_INJECTION, COMMAND_HANDLERS_FOR_INJECTION
 
 #create interface
 class OrganizationRabbitMQBroker(RabbitMQMessageBroker):
     queue = "organization"
     exchange = "organization"
-    event_handlers = EVENT_HANDLERS_FOR_INJECTION
+    event_handlers = DOMAIN_EVENT_HANDLERS_FOR_INJECTION #add external also
     command_handlers = COMMAND_HANDLERS_FOR_INJECTION
     router_keys_for_queues = {
         "organization":[

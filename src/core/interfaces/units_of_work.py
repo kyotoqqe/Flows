@@ -28,6 +28,5 @@ class AbstractUnitOfWork(ABC):
             if isinstance(attr, TrackingRepository):
                 events.extend(list(attr.seen))
 
-        print(bool(events))
         while events:
             yield events.pop(0)
