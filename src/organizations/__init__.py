@@ -1,15 +1,23 @@
 from src.organizations.organizations.application.units_of_work import RedisOrganizationRequestsUnitOfWork, \
         SQLAlchemyOrganizationsUnitOfWork
+from src.organizations.organizations.domain.events import OrganizationCreated
 from src.organizations.organizations.application.commands import CreateOrganizationRequest, CheckOrganizationExistence, \
         DeleteOrganizationRequest
 from src.organizations.organizations.application.handlers import CreateOrganizationHandler, CreateOrganizationRequestHandler, \
         CheckOrganizationExistenceHandler, DeleteOrganizationRequestHandler
 
+from src.organizations.membership.application.handlers import CreateMembershipHandler
+from src.organizations.membership.application.units_of_work import SQLAlchemyMembershipsUnitOfWork
+
+#change this
 from src.payments.application.events import OrganizationPaymentSucceeded
 
 
-DOMAIN_EVENT_HANDLERS_FOR_INJECTION = {
 
+DOMAIN_EVENT_HANDLERS_FOR_INJECTION = {
+    OrganizationCreated: [
+        CreateMembershipHandler(uow=SQLAlchemyMembershipsUnitOfWork())
+    ],
 }
 
 #transform external events
@@ -28,5 +36,5 @@ COMMAND_HANDLERS_FOR_INJECTION = {
     ],
     DeleteOrganizationRequest: [
         DeleteOrganizationRequestHandler(uow=RedisOrganizationRequestsUnitOfWork())
-    ]
+    ],
 }

@@ -8,6 +8,7 @@ from src.organizations.organizations.application.commands import CreateOrganizat
 from src.organizations.organizations.interfaces.units_of_works import OrganizationRequestsUnitOfWork, OrganizationsUnitOfWork
 from src.organizations.organizations.domain.value_obj import OrganizationRequest
 from src.organizations.organizations.domain.entities import Organization
+from src.organizations.organizations.domain.events import OrganizationCreated
 
 from src.payments.application.events import OrganizationPaymentSucceeded
 
@@ -59,7 +60,10 @@ class CreateOrganizationHandler(AbstractEventHandler):
             model = Organization(**asdict(event))
             model.owner_id = int(model.owner_id)
             organization = await self.uow.organizations.add(model, exclude={"id", "version_num", "events"})
-
+            model.events.append(OrganizationCreated(
+                organizaton_id=organization.id,
+                owner_id=organization.owner_id
+            ))
             await self.uow.commit()
             await messagebus.handle(
                 DeleteOrganizationRequest(model.name, model.nickname)
