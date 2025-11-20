@@ -3,11 +3,12 @@ from typing import Annotated
 
 from src.core.messagebus import MessageBus
 
-from src.auth.schemas import UserSchema
-from src.auth.dependencies import get_active_user
+from src.profiles.dependencies import get_profile
+from src.profiles.schemas import ProfileSchema
 
 from src.organizations.organizations.api.schemas import CreateOrganizationRequestSchema
-from src.organizations import EVENT_HANDLERS_FOR_INJECTION, COMMAND_HANDLERS_FOR_INJECTION
+from src.organizations import DOMAIN_EVENT_HANDLERS_FOR_INJECTION, EXTERNAL_EVENT_HANDLERS_FOR_INJECTION, \
+    COMMAND_HANDLERS_FOR_INJECTION
 from src.organizations.organizations.application.commands import CreateOrganizationRequest
 from src.organizations.organizations.infrastructure.rabbitmq.broker import OrganizationRabbitMQBroker
 
@@ -19,11 +20,11 @@ router = APIRouter(
 @router.post("/request")
 async def create_organization_request(
     #change on Auth domain call
-    user: Annotated[UserSchema, Depends(get_active_user)],
+    user: Annotated[ProfileSchema, Depends(get_profile)],
     organization_request: CreateOrganizationRequestSchema
 ):
     messagebus = MessageBus(
-        event_handlers=EVENT_HANDLERS_FOR_INJECTION,
+        event_handlers=DOMAIN_EVENT_HANDLERS_FOR_INJECTION | EXTERNAL_EVENT_HANDLERS_FOR_INJECTION,
         command_handlers=COMMAND_HANDLERS_FOR_INJECTION,
         broker=OrganizationRabbitMQBroker()
     )
