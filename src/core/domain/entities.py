@@ -17,7 +17,7 @@ class Entity(AbstractModel):
     def __hash__(self):
         return hash(self.id)
 #fix this
-@dataclass(kw_only=True)
+@dataclass(eq=False, kw_only=True)
 class AggregateRoot(Entity, BusinessRuleValidationMixin):
     version_num: int = field(default=0)
     events: List[DomainEvent] = field(default_factory=list)
