@@ -57,18 +57,19 @@ class CreateOrganizationHandler(AbstractEventHandler):
 
     async def __call__(self, event: OrganizationPaymentSucceeded, messagebus: MessageBus):
         async with self.uow:
-            model = Organization(**asdict(event))
+            model = Organization(**asdict(event), events=[])
             model.owner_id = int(model.owner_id)
             organization = await self.uow.organizations.add(model, exclude={"id", "version_num", "events"})
-            model.events.append(OrganizationCreated(
-                organizaton_id=organization.id,
-                owner_id=organization.owner_id
-            ))
             await self.uow.commit()
-            await messagebus.handle(
-                DeleteOrganizationRequest(model.name, model.nickname)
-            )
-            return organization
+
+        model.events.append(OrganizationCreated(
+            organizaton_id=organization.id,
+            owner_id=organization.owner_id
+        ))
+        await messagebus.handle(
+            DeleteOrganizationRequest(model.name, model.nickname)
+        )
+        return model
 
 
 class DeleteOrganizationRequestHandler(AbstractCommandHandler):

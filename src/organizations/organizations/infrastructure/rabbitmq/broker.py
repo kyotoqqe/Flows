@@ -13,7 +13,8 @@ class OrganizationRabbitMQBroker(RabbitMQMessageBroker):
     router_keys_for_queues = {
         "organization":[
             "organization.request.created",
-            "check.organization.existence"
+            "check.organization.existence",
+            "organization.created",
         ]
     }
     
