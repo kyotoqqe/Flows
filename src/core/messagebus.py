@@ -59,7 +59,7 @@ class MessageBus:
                 await handler(event)
                                     
             for event in handler.uow.events:
-                self.broker.publish(event)
+                await self.broker.publish(event)
 
     async def _handle_command(self, command: Command, **kwargs):
          for handler in self.command_handlers[type(command)]:
@@ -67,9 +67,11 @@ class MessageBus:
                 self._command_result = await handler(command, self, **kwargs)
             else:
                 self._command_result = await handler(command, **kwargs)
-                                    
+          
             for event in handler.uow.events:
+                print(f"domain events {event}")
                 await self.broker.publish(event)
+
 
     @property
     def command_result(self):

@@ -10,15 +10,12 @@ from src.organizations.membership.domain.rules import IsCanAddMembers, IsHasAuth
 #change on profile_id
 @dataclass(eq=False)
 class Member(Entity):
-<<<<<<< Updated upstream
-    profile_id: int
-=======
     owner_id: int
     role: MemberRole
     membership_id: int
->>>>>>> Stashed changes
     description: Optional[str] = None
     role: MemberRole
+    description: Optional[str] = None
     can_change_organization_info: bool = field(default=False)
     can_invite_members: bool = field(default=False) 
     can_create_shows: bool = field(default=False)

@@ -22,12 +22,8 @@ DOMAIN_EVENT_HANDLERS_FOR_INJECTION = {
     ],
 }
 
+#transform external events
 EXTERNAL_EVENT_HANDLERS_FOR_INJECTION = {
-    
-}
-
-EVENT_HANDLERS_FOR_INJECTION = {
-    #maybe create separate dict for external events
     OrganizationPaymentSucceeded: [
         CreateOrganizationHandler(uow=SQLAlchemyOrganizationsUnitOfWork())
     ]
