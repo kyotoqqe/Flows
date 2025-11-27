@@ -1,5 +1,4 @@
 from abc import ABC, abstractmethod
-
 from typing import Optional, Union, Dict, Set
 
 from src.core.interfaces.model import AbstractModel
@@ -41,6 +40,7 @@ class TrackingRepository:
 
     async def add(self, model: AbstractModel, exclude: Optional[Set] = None):
         self.seen.add(model)
+        print(f"Model={model}")
         model = await self.repository.add(model, exclude)
         return model
     
