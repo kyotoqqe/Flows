@@ -9,7 +9,8 @@ members_table = Table(
     "members",
     mapper_registry.metadata,
     Column("id", Integer, primary_key=True, autoincrement=True, nullable=False),
-    Column("profile_id", ForeignKey("profiles.id", ondelete="CASCADE"), nullable=False),
+    Column("owner_id", ForeignKey("profiles.id", ondelete="CASCADE"), nullable=False),
+    Column("membership_id", ForeignKey("memberships.id", ondelete="CASCADE"), nullable=False),
     Column("role", Enum(MemberRole), default=MemberRole.member, nullable=False),
     Column("is_visible", Boolean, nullable=False, default=True),
     Column("can_change_organization_info", Boolean, nullable=False, default=False),
@@ -29,12 +30,23 @@ memberships_table = Table(
 def start_mappers():
     from src.organizations.membership.domain.entities import Member, Membership
 
-    mapper_registry.map_imperatively(Member, members_table)
+    mapper_registry.map_imperatively(
+        Member, members_table,
+        properties = {
+            "membership": relationship(Membership, back_populates="members")
+        }
+    )
 
     mapper_registry.map_imperatively(
         Membership, memberships_table,
         properties = {
-            "owner": relationship(Member, uselist=False),
-            "members": relationship(Member, cascade="all, delete-orphan")
+            "owner": relationship(Member, 
+                    primaryjoin="Membership.id == Member.membership_id and Member.role == MemberRole.owner", 
+                    uselist=False,
+                    overlaps="membership"),
+            "members": relationship(Member, 
+                    back_populates="membership", 
+                    cascade="all, delete-orphan",
+                    overlaps="owner")
         }
     )

@@ -1,13 +1,9 @@
-from dataclasses import dataclass
+from pydantic import BaseModel 
 from typing import Optional
-
-from src.core.interfaces.commands import Command
 
 from src.organizations.membership.domain.value_obj import MemberRole
 
-@dataclass
-class CreateMember(Command):
-    inviter_id: int
+class CreateMemberSchema(BaseModel):
     invitee_id: int
     description: str
     membership_id: int
@@ -16,25 +12,20 @@ class CreateMember(Command):
     can_create_shows: bool
     can_add_venue_requests: bool
 
-@dataclass
-class DeleteMember(Command):
+class DeleteMemberSchema(BaseModel):
     membership_id: int
-    actor_id: int
     target_id: int
 
-@dataclass
-class ChangeOwner(Command):
+class ChangeOwnerSchema(BaseModel):
     membership_id: int
-    actor_id: int
     target_id: int
 
-@dataclass
-class UpdateMember(Command):
+class UpdateMemberSchema(BaseModel):
     membership_id: int
-    actor_id: int
     target_id: int
-    description: Optional[str] = None
+    membership_id: int
     role: Optional[MemberRole] = None
+    description: Optional[str] = None
     can_change_organization_info: Optional[bool] = None
     can_invite_members: Optional[bool] = None
     can_create_shows: Optional[bool] = None

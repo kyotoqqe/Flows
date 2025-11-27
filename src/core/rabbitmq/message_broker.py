@@ -65,7 +65,7 @@ class RabbitMQMessageBroker(MessageBroker):
             data = json.loads(payload)
             data["type"] = self.convert_routing_key(data.get("type"))
             print(data["type"])
-
+            print(self.event_handlers)
             messagebus = MessageBus(
                 event_handlers=self.event_handlers,
                 command_handlers=self.command_handlers,

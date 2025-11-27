@@ -4,6 +4,8 @@ from src.core.database.orm import start_mappers as images_mappers
 from src.auth.infrastructure.database.orm import start_mappers as users_mappers
 from src.profiles.infrastructure.database.orm import start_mappers as profiles_mappers
 from src.organizations.organizations.infrastructure.database.orm import start_mappers as organizations_mappers
+from src.organizations.membership.infrastructure.database.orm import start_mappers as memberships_mappers
+
 
 
 from src.organizations.organizations.infrastructure.rabbitmq.broker import OrganizationRabbitMQBroker
@@ -16,6 +18,7 @@ async def main():
     profiles_mappers()
     images_mappers()
     organizations_mappers()
+    memberships_mappers()
 
     connection = await get_connection()
 
