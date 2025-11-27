@@ -26,7 +26,8 @@ class AbstractUnitOfWork(ABC):
         for attr in dir(self):
             attr = getattr(self, attr)
             if isinstance(attr, TrackingRepository):
-                events.extend(list(attr.seen))
-
+                for obj in attr.seen:
+                    events.extend(obj.events)
         while events:
+            print(f"Event {events}")
             yield events.pop(0)
