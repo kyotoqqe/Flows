@@ -26,6 +26,13 @@ build-job:
   script:
     - docker build -t flows-app .
 
+linter-job:
+  stage: test
+  script:
+    - isort --settings-file ./.isort.cfg .
+    - black --config ./.black .
+    - flake8 --config .flake8 .
+
 test-job:
   stage: test
   script:
