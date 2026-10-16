@@ -1,0 +1,46 @@
+[project]
+name =  "test"#"auth"
+version = "0.1.0"
+description = "Authentication service for Flows project"
+requires-python = ">=3.13"
+
+dependencies = [
+    "fastapi",
+    "uvicorn[standard]",
+    "pydantic-settings",
+    "sqlalchemy",
+    "asyncpg",
+    "alembic",
+    "aio-pika",
+    "aiohttp>=3.14.3",
+    "pwdlib[bcrypt]>=0.3.1",
+    "cryptography>=50.0.1",
+    "pyjwt>=2.15.0",
+    "redis[hiredis]>=8.1.0",
+]
+
+[dependency-groups]
+dev = [
+    "pytest",
+    "pytest-asyncio",
+    "httpx",
+    "ruff",
+    "mypy",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py313"
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+pythonpath = [
+    ".",
+    "shared",
+    "scripts"
+]
+testpaths = ["shared/tests"]
+
+[tool.pyright]
+venvPath = "."
+venv = ".venv"

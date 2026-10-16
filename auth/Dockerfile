@@ -1,0 +1,38 @@
+FROM python:3.13-slim AS build
+
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+  PYTHONUNBUFFERED=1 \
+  PIP_DISABLE_PIP_VERSION_CHECK=1 \
+  UV_COMPILE_BYTECODE=1 \
+  UV_LINK_MODE=copy \
+  UV_CACHE_DIR=/root/.cache/uv 
+
+
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
+
+WORKDIR /usr/app
+
+RUN --mount=type=cache,target=/root/.cache/uv \
+  --mount=type=bind,source=uv.lock,target=uv.lock \
+  --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
+  uv sync --frozen --no-dev --no-install-project
+
+FROM  python:3.13-slim 
+
+WORKDIR /usr/app
+
+RUN useradd -u 1001 nonroot
+
+COPY --from=build --chown=nonroot:nonroot /usr/app/.venv ./.venv 
+
+ENV PATH="/usr/app/.venv/bin:$PATH"
+
+COPY --chown=nonroot:nonroot . .
+
+USER nonroot
+
+EXPOSE 8000
+
+CMD [ "uvicorn",  "src.main:app" , "--host", "0.0.0.0", "--port", "8000" ]
+

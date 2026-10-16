@@ -1,0 +1,16 @@
+{
+  "template": "https://github.com/kyotoqqe/python-service-template.git",
+  "commit": "7297ffab7e8e5fb01d392cc14434b6f1fb29f51b",
+  "checkout": null,
+  "context": {
+    "cookiecutter": {
+      "service_name": "auth",
+      "package_name": "auth",
+      "description": "Authentication service for Flows project",
+      "python_version": "3.14",
+      "_template": "https://github.com/kyotoqqe/python-service-template.git",
+      "_commit": "7297ffab7e8e5fb01d392cc14434b6f1fb29f51b"
+    }
+  },
+  "directory": null
+}
