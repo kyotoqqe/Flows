@@ -1,0 +1,38 @@
+# Git
+.git
+.gitignore
+.gitattributes
+
+# Environments & uv
+.venv/
+.uv/
+uv.lock.tmp
+
+# Python bytecode & cache
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.pyright_cache/
+
+# IDEs & Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Docker / CI / Configs
+Dockerfile*
+docker-compose*
+.dockerignore
+.github/
+.devbox/
+
+# Local data & logs
+.env
+.env.*
+!.env.example
+*.log
+*.sqlite3

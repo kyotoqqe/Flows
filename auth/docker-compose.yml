@@ -1,0 +1,66 @@
+services:
+  postgres:
+    image: postgres:17-alpine
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - 5439:5432
+    restart: always
+    command: "postgres -c max_connections=150 -c shared_buffers=512MB -c effective_cache_size=1536MB -c maintenance_work_mem=128MB -c checkpoint_completion_target=0.9 -c wal_buffers=16MB -c default_statistics_target=100 -c random_page_cost=1.1 -c effective_io_concurrency=200 -c work_mem=3495kB -c min_wal_size=1GB -c max_wal_size=4GB -c max_worker_processes=2 -c max_parallel_workers_per_gather=1 -c max_parallel_workers=2 -c max_parallel_maintenance_workers=1"
+    env_file:
+      - .env
+
+  postgres-test:
+    image: postgres:17-alpine
+    volumes:
+      - pgtest:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
+    restart: always
+    command: "postgres -c max_connections=150 -c shared_buffers=512MB -c effective_cache_size=1536MB -c maintenance_work_mem=128MB -c checkpoint_completion_target=0.9 -c wal_buffers=16MB -c default_statistics_target=100 -c random_page_cost=1.1 -c effective_io_concurrency=200 -c work_mem=3495kB -c min_wal_size=1GB -c max_wal_size=4GB -c max_worker_processes=2 -c max_parallel_workers_per_gather=1 -c max_parallel_workers=2 -c max_parallel_maintenance_workers=1"
+    environment:
+      - POSTGRES_USER=${TEST_POSTGRES_USER}
+      - POSTGRES_PASSWORD=${TEST_POSTGRES_PASSWORD}
+      - POSTGRES_DB=${TEST_POSTGRES_DB}
+
+  rabbitmq:
+    image: rabbitmq:4-management-alpine
+    volumes:
+      - rabbimq-data:/var/lib/rabbitmq
+    ports:
+      - 5672:5672
+      - 15672:15672
+    env_file:
+      - .env
+
+  #outbox
+  #user app
+
+  tests:
+    build:
+      context: .
+      dockerfile: Dockerfile.test
+    volumes:
+      - ./shared:/usr/app/shared
+      - ./tests:/usr/app/tests
+      - ./scripts:/usr/app/scripts
+      - ./src:/usr/app/src
+    env_file:
+      - .env
+    depends_on:
+      - postgres-test
+      - rabbitmq
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - 8000:8000
+    env_file:
+      - .env
+
+volumes:
+  pgdata: {}
+  pgtest: {}
+  rabbimq-data: {}
